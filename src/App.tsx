@@ -1,10 +1,11 @@
 import React, { useState, createContext } from 'react';
-import { Box, Collapse, Hidden, ThemeProvider } from '@mui/material';
+import { Box, Hidden, ThemeProvider } from '@mui/material';
 
 import { Home } from './screens/Home';
 import { About } from './screens/About';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { MobileDialog } from './components/MobileDialog';
 
 import { theme } from './Theme';
 import { DataType, Screen } from './Constants';
@@ -34,6 +35,7 @@ function App() {
   const [rhymes, setRhymes] = useState<DataPoint[]>([]);
   const [synonyms, setSynonyms] = useState<DataPoint[]>([]);
   const [relatedWords, setRelatedWords] = useState<DataPoint[]>([]);
+  const [isOpenMobileDialog, setIsOpenMobileDialog] = useState<boolean>(true);
 
   const contextValue = {
     screen,
@@ -69,6 +71,9 @@ function App() {
           </Box>
           <Hidden mdDown>
             <Footer />
+          </Hidden>
+          <Hidden smUp>
+            <MobileDialog isOpen={isOpenMobileDialog} setIsOpen={setIsOpenMobileDialog} />
           </Hidden>
         </Box>
       </Context.Provider>
