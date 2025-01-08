@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useEffect } from 'react';
 import { Box, Hidden, ThemeProvider } from '@mui/material';
 
 import { Home } from './screens/Home';
@@ -35,7 +35,8 @@ function App() {
   const [rhymes, setRhymes] = useState<DataPoint[]>([]);
   const [synonyms, setSynonyms] = useState<DataPoint[]>([]);
   const [relatedWords, setRelatedWords] = useState<DataPoint[]>([]);
-  const [isOpenMobileDialog, setIsOpenMobileDialog] = useState<boolean>(true);
+
+  const [hasDismissedDialog, setHasDismissedDialog] = useState<boolean>(false);
 
   const contextValue = {
     screen,
@@ -54,6 +55,23 @@ function App() {
 
   const isAboutScreen = screen === Screen.ABOUT;
 
+  const handleDismiss = () => {
+    localStorage.setItem('preferences', JSON.stringify({ dismissedDialog: true }));
+    setHasDismissedDialog(true);
+  };
+
+  useEffect(() => {
+    const json = localStorage.getItem('preferences');
+
+    if (json) {
+      const preferences = JSON.parse(json);
+
+      if (preferences.dismissedDialog) {
+        setHasDismissedDialog(true);
+      }
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <Context.Provider value={contextValue}>
@@ -69,12 +87,12 @@ function App() {
           <Box sx={{ height: { md: '100%' }, px: { xs: '12px', sm: '12px', md: '24px' } }}>
             {(isAboutScreen && <About />) || <Home />}
           </Box>
-          <Hidden mdDown>
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
             <Footer />
-          </Hidden>
-          <Hidden smUp>
-            <MobileDialog isOpen={isOpenMobileDialog} setIsOpen={setIsOpenMobileDialog} />
-          </Hidden>
+          </Box>
+          <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+            <MobileDialog isOpen={!hasDismissedDialog} handleDismiss={handleDismiss} />
+          </Box>
         </Box>
       </Context.Provider>
     </ThemeProvider>
